@@ -14,14 +14,14 @@ class Scratch3YourExtension {
     getInfo () {
         return {
             // unique ID for your extension
-            id: 'yourScratchExtension',
+            id: 'cddWeatherAPIExt',
 
             // name that will be displayed in the Scratch UI
-            name: 'Demo',
+            name: 'Weather',
 
             // colours to use for your extension blocks
-            color1: '#000099',
-            color2: '#660066',
+            color1: '#00D084',
+            color2: '#59FF00',
 
             // icons to display
             blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAAFklEQVQYV2P4DwMMEMgAI/+DEUIMBgAEWB7i7uidhAAAAABJRU5ErkJggg==',
@@ -41,7 +41,7 @@ class Scratch3YourExtension {
                     blockType: BlockType.REPORTER,
 
                     // label to display on the block
-                    text: 'My first block [MY_NUMBER] and [MY_STRING]',
+                    text: 'Enter a town/city to get the weather for: [TOWN_CITY]',
 
                     // true if this block should end a stack
                     terminal: false,
@@ -54,22 +54,9 @@ class Scratch3YourExtension {
 
                     // arguments used in the block
                     arguments: {
-                        MY_NUMBER: {
+                        TOWN_CITY: {
                             // default value before the user sets something
-                            defaultValue: 123,
-
-                            // type/shape of the parameter - choose from:
-                            //     ArgumentType.ANGLE - numeric value with an angle picker
-                            //     ArgumentType.BOOLEAN - true/false value
-                            //     ArgumentType.COLOR - numeric value with a colour picker
-                            //     ArgumentType.NUMBER - numeric value
-                            //     ArgumentType.STRING - text value
-                            //     ArgumentType.NOTE - midi music value with a piano picker
-                            type: ArgumentType.NUMBER
-                        },
-                        MY_STRING: {
-                            // default value before the user sets something
-                            defaultValue: 'hello',
+                            defaultValue: 'Dungannon',
 
                             // type/shape of the parameter - choose from:
                             //     ArgumentType.ANGLE - numeric value with an angle picker
@@ -91,10 +78,21 @@ class Scratch3YourExtension {
      * implementation of the block with the opcode that matches this name
      *  this will be called when the block is used
      */
-    myFirstBlock ({ MY_NUMBER, MY_STRING }) {
-        // example implementation to return a string
-        return MY_STRING + ' : doubled would be ' + (MY_NUMBER * 2);
+    myFirstBlock ({ TOWN_CITY }) {
+        return fetch('https://api.weatherapi.com/v1/current.json?key=7a810867ae3842639a5162943231104&q=' + TOWN_CITY)
+            .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            else {
+                return { text: 'Unknown' };
+            }
+            })
+            .then((weather) => {
+                return weather.current.condition.text;
+            });
     }
+
 }
 
 module.exports = Scratch3YourExtension;
